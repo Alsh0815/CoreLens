@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PopupWindowTipsAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_options_fadein</item>
+        <item name="android:windowExitAnimation">@anim/popup_options_fadeout</item>
+    </style>
+</resources>

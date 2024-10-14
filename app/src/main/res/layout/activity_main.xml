@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cam_layout_header_size"
+            android:id="@+id/MainActivity__Header"
+            android:background="#00000000"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/MainActivity__Header_Lens_LL"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lens"
+                    android:textColor="@color/PrimaryTextColor" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/MainActivity__Header_Lens_TV"
+                    android:padding="@dimen/cam_layout_header_item_padding"
+                    android:text="24mm"
+                    android:textColor="@color/CameraOptionTextColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Format"
+                    android:textColor="@color/PrimaryTextColor" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/MainActivity__Header_Format_TV"
+                    android:padding="@dimen/cam_layout_header_item_padding"
+                    android:text="JPEG"
+                    android:textColor="@color/CameraOptionTextColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/MainActivity__Header_SS_LL"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SS"
+                    android:textColor="@color/PrimaryTextColor" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/MainActivity__Header_SS_TV"
+                    android:padding="@dimen/cam_layout_header_item_padding"
+                    android:text="Auto"
+                    android:textColor="@color/CameraOptionTextColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/MainActivity__Header_ISO_LL"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ISO"
+                    android:textColor="@color/PrimaryTextColor" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/MainActivity__Header_ISO_TV"
+                    android:padding="@dimen/cam_layout_header_item_padding"
+                    android:text="Auto"
+                    android:textColor="@color/CameraOptionTextColor" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextureView
+            android:id="@+id/MainActivity__TextureView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cam_layout_texture_size"
+            android:layout_above="@id/MainActivity__ControlPanel1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/MainActivity__TextureView"
+            android:layout_alignBottom="@id/MainActivity__TextureView"
+            android:id="@+id/MainActivity__Wait_LL"
+            android:background="#50000000"
+            android:gravity="center"
+            android:visibility="invisible">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.ProgressBar" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/MainActivity__TextureView"
+            android:background="#80000000"
+            android:orientation="horizontal">
+            <!-- Stat View -->
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cam_layout_control_panel_1_size"
+            android:layout_above="@id/MainActivity__ControlPanel2"
+            android:id="@+id/MainActivity__ControlPanel1"
+            android:background="@color/PrimaryBackgroundColor"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cam_layout_cp1_iv_size"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/cam_layout_cp1_iv_padding_size"
+                android:id="@+id/MainActivity__Light_IV"
+                android:padding="@dimen/cam_layout_cp1_iv_padding_size"
+                android:src="@drawable/ic_light_mode"
+                app:tint="@color/PrimaryTextColor" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cam_layout_cp1_iv_size"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/cam_layout_cp1_iv_padding_size"
+                android:id="@+id/MainActivity__Focus_IV"
+                android:padding="@dimen/cam_layout_cp1_iv_padding_size"
+                android:src="@drawable/ic_focus"
+                app:tint="@color/PrimaryTextColor" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cam_layout_cp1_iv_size"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/cam_layout_cp1_iv_padding_size"
+                android:id="@+id/MainActivity__Flash_IV"
+                android:padding="@dimen/cam_layout_cp1_iv_padding_size"
+                android:src="@drawable/ic_flash_off"
+                app:tint="@color/PrimaryTextColor" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cam_layout_cp1_iv_size"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/cam_layout_cp1_iv_padding_size"
+                android:id="@+id/MainActivity__Aspect_IV"
+                android:padding="@dimen/cam_layout_cp1_iv_padding_size"
+                android:src="@drawable/ic_aspect_16_9"
+                app:tint="@color/PrimaryTextColor" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cam_layout_cp1_iv_size"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/cam_layout_cp1_iv_padding_size"
+                android:id="@+id/MainActivity__Settings_IV"
+                android:padding="@dimen/cam_layout_cp1_iv_padding_size"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/PrimaryTextColor" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cam_layout_control_panel_2_size"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/MainActivity__ControlPanel2"
+            android:background="@color/PrimaryBackgroundColor"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/MainActivity__Image_CV"
+                    android:clickable="true"
+                    android:elevation="4dp"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:cardBackgroundColor="@color/black"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    android:focusable="true">
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:id="@+id/MainActivity__LastTaken_IV"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="center" />
+            </androidx.cardview.widget.CardView>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/MainActivity__Grab"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:clickable="true"
+                    android:elevation="4dp"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:cardBackgroundColor="#303030"
+                    app:cardCornerRadius="36dp"
+                    app:cardElevation="0dp"
+                    android:focusable="true">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_grab"
+                        app:tint="@color/PrimaryTextColor" />
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:id="@+id/MainActivity__Flip"
+                    android:clickable="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_flip_camera"
+                    app:tint="@color/PrimaryTextColor"
+                    android:focusable="true" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

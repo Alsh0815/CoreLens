@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cam_layout_header_size">64dp</dimen>
+    <dimen name="cam_layout_texture_size">475dp</dimen>
+    <dimen name="cam_layout_header_item_padding">8dp</dimen>
+    <dimen name="cam_layout_control_panel_1_size">50dp</dimen>
+    <dimen name="cam_layout_control_panel_2_size">140dp</dimen>
+    <dimen name="cam_layout_cp1_iv_size">48dp</dimen>
+    <dimen name="cam_layout_cp1_iv_padding_size">8dp</dimen>
+</resources>

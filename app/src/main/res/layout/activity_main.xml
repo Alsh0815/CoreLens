@@ -119,11 +119,49 @@
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="@dimen/cam_layout_uopt_height"
+            android:layout_alignBottom="@id/MainActivity__TextureView"
+            android:background="#60000000"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/MainActivity__TextureView"
-            android:background="#80000000"
+            android:background="#20000000"
+            android:gravity="center"
             android:orientation="horizontal">
-            <!-- Stat View -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_zoom_out"
+                app:tint="@color/PrimaryTextColor" />
+            <SeekBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:id="@+id/MainActivity__Zoom_SB"
+                android:min="10"
+                android:max="80" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_zoom_in"
+                app:tint="@color/PrimaryTextColor" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:id="@+id/MainActivity__Zoom_TV"
+                android:text="x1.0"
+                android:textColor="@color/PrimaryTextColor" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

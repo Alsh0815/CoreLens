@@ -14,10 +14,12 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +28,9 @@ import com.x_viria.app.light.corelens.core.Camera;
 import com.x_viria.app.light.corelens.core.Media;
 import com.x_viria.app.light.corelens.core.callback.ImageReaderCallback;
 import com.x_viria.app.light.corelens.ui.overlay.PopupOptions;
+import com.x_viria.app.light.corelens.utils.Pixels;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,10 +80,19 @@ public class MainActivity extends AppCompatActivity {
         ss_tv.setText(key_ss);
         iso_tv.setText(key_iso);
 
+        SeekBar Zoom_SB = findViewById(R.id.MainActivity__Zoom_SB);
+        try {
+            Log.d("", CAMERA.getId() + " - " + String.valueOf(CAMERA.getMaxZoom()));
+            Zoom_SB.setMax((int) (CAMERA.getMaxZoom() * 10.0f));
+        } catch (CameraAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         ImageView LastTaken_IV = findViewById(R.id.MainActivity__LastTaken_IV);
         LastTaken_IV.setImageURI(new Media(this).getLastTakenImageUri());
 
-        CAMERA.getAspectList();
+        Map<String, Pixels.Info> aspectList = CAMERA.getAspectList();
+
     }
 
     @Override
@@ -96,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
         CAMERA.setTextureView(textureView);
 
         textureView.setSurfaceTextureListener(textureListener);
+
+        SeekBar Zoom_SB = findViewById(R.id.MainActivity__Zoom_SB);
+        TextView Zoom_TV = findViewById(R.id.MainActivity__Zoom_TV);
 
         LinearLayout Lens_LL = findViewById(R.id.MainActivity__Header_Lens_LL);
         Lens_LL.setOnClickListener(v -> {
@@ -114,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
                     @SuppressLint("MissingPermission")
                     public void onClick(String key, String id) {
                         CAMERA.open(id);
+                        Zoom_SB.setProgress(10);
+                        Zoom_TV.setText("x1.0");
                         TextView lens_tv = findViewById(R.id.MainActivity__Header_Lens_TV);
                         lens_tv.setText(key);
                         try {
@@ -137,7 +155,11 @@ public class MainActivity extends AppCompatActivity {
                 popupOptions.show(v, map, new PopupOptions.PopupOptionsCallback<Long>() {
                     @SuppressLint("MissingPermission")
                     public void onClick(String key, Long ns) {
-                        CAMERA.setSS(ns);
+                        try {
+                            CAMERA.setSS(ns);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                         TextView ss_tv = findViewById(R.id.MainActivity__Header_SS_TV);
                         if (ns == -1L) {
                             ss_tv.setText(key);
@@ -165,7 +187,11 @@ public class MainActivity extends AppCompatActivity {
                 popupOptions.show(v, map, new PopupOptions.PopupOptionsCallback<Integer>() {
                     @SuppressLint("MissingPermission")
                     public void onClick(String key, Integer iso) {
-                        CAMERA.setISO(iso);
+                        try {
+                            CAMERA.setISO(iso);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                         TextView iso_tv = findViewById(R.id.MainActivity__Header_ISO_TV);
                         if (iso == -1) {
                             iso_tv.setText(key);
@@ -183,6 +209,36 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         });
+
+        Zoom_SB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float scale = (float) progress / 10.0f;
+                Zoom_TV.setText(String.format("x%.1f", scale));
+                try {
+                    CAMERA.setZoom(scale);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        new Handler().postDelayed(() -> {
+            try {
+                Zoom_SB.setMax((int) (CAMERA.getMaxZoom() * 10.0f));
+            } catch (CameraAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }, 1000);
 
         ImageView Settings_IV = findViewById(R.id.MainActivity__Settings_IV);
         Settings_IV.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));

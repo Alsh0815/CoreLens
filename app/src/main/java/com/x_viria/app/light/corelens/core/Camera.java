@@ -3,6 +3,7 @@ package com.x_viria.app.light.corelens.core;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -27,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 
 import com.x_viria.app.light.corelens.core.callback.ImageReaderCallback;
+import com.x_viria.app.light.corelens.utils.Pixels;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class Camera {
     private TextureView TEXTURE_VIEW;
 
     private int LENS_FACING = CameraCharacteristics.LENS_FACING_BACK;
+    private float ZOOM = 1.0f;
 
     public Camera(Activity activity) {
         this.ACTIVITY = activity;
@@ -108,7 +111,8 @@ public class Camera {
         return list;
     }
 
-    public void getAspectList() throws CameraAccessException {
+    public Map<String, Pixels.Info> getAspectList() throws CameraAccessException {
+        Map<String, Pixels.Info> list = new LinkedHashMap<>();
         CameraCharacteristics characteristics = CAMERA_MANAGER.getCameraCharacteristics(CAMERA_ID);
         StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
@@ -118,9 +122,19 @@ public class Camera {
                 int width = size.getWidth();
                 int height = size.getHeight();
                 float aspectRatio = (float) width / height;
-                Log.d("CameraAspectRatio", "Supported size: " + width + "x" + height + ", Aspect ratio: " + aspectRatio);
+                float[] aspect = Pixels.getAspectRatio(width, height);
+                Pixels.Info info = new Pixels.Info();
+                info.width = width;
+                info.height = height;
+                info.aspectRatio = aspectRatio;
+                info.aspectX = aspect[0];
+                info.aspectY = aspect[1];
+                String key = String.format("%d:%d", (int) aspect[0], (int) aspect[1]);
+                list.put(key, info);
             }
         }
+
+        return list;
     }
 
     public int getISO() {
@@ -132,6 +146,16 @@ public class Camera {
     public Range<Integer> getISORange(String id) throws CameraAccessException {
         CameraCharacteristics characteristics = CAMERA_MANAGER.getCameraCharacteristics(id);
         return characteristics.get(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE);
+    }
+
+    public float getMaxZoom() throws CameraAccessException {
+        CameraCharacteristics characteristics = CAMERA_MANAGER.getCameraCharacteristics(CAMERA_ID);
+        return characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
+    }
+
+    public float getMaxZoom(String id) throws CameraAccessException {
+        CameraCharacteristics characteristics = CAMERA_MANAGER.getCameraCharacteristics(id);
+        return characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
     }
 
     public long getSS() {
@@ -187,7 +211,7 @@ public class Camera {
         }
     }
 
-    public void setISO(int iso) {
+    public void setISO(int iso) throws Exception {
         if (iso == -1) {
             CAPTURE_REQUEST_BUILDER.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
         } else {
@@ -198,7 +222,7 @@ public class Camera {
         updatePreview();
     }
 
-    public void setSS(long ns) {
+    public void setSS(long ns) throws Exception {
         if (ns == -1L) {
             CAPTURE_REQUEST_BUILDER.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
         } else {
@@ -211,6 +235,24 @@ public class Camera {
 
     public void setTextureView(TextureView textureView) {
         this.TEXTURE_VIEW = textureView;
+    }
+
+    public void setZoom(float scale) throws Exception {
+        CameraCharacteristics characteristics = CAMERA_MANAGER.getCameraCharacteristics(CAMERA_ID);
+        Rect activeRect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        scale = Math.max(1.0f, Math.min(scale, getMaxZoom()));
+
+        assert activeRect != null;
+        int centerX = activeRect.centerX();
+        int centerY = activeRect.centerY();
+        int deltaX = (int) ((0.5f * activeRect.width()) / scale);
+        int deltaY = (int) ((0.5f * activeRect.height()) / scale);
+
+        Rect zoomRect = new Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY);
+
+        this.ZOOM = scale;
+        CAPTURE_REQUEST_BUILDER.set(CaptureRequest.SCALER_CROP_REGION, zoomRect);
+        updatePreview();
     }
 
     public void takePicture(ImageReaderCallback ir_callback) {
@@ -234,6 +276,14 @@ public class Camera {
             final CaptureRequest.Builder captureBuilder = CAMERA_DEVICE.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+
+            Rect activeRect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            int centerX = activeRect.centerX();
+            int centerY = activeRect.centerY();
+            int deltaX = (int) ((0.5f * activeRect.width()) / ZOOM);
+            int deltaY = (int) ((0.5f * activeRect.height()) / ZOOM);
+            Rect zoomRect = new Rect(centerX - deltaX, centerY - deltaY, centerX + deltaX, centerY + deltaY);
+            captureBuilder.set(CaptureRequest.SCALER_CROP_REGION, zoomRect);
 
             int rotation = ACTIVITY.getWindowManager().getDefaultDisplay().getRotation();
             int jpegOrientation = getJpegOrientation(characteristics, rotation);
@@ -407,7 +457,11 @@ public class Camera {
                         return;
                     }
                     CAMERA_CAPTURE_SESSION = session;
-                    updatePreview();
+                    try {
+                        updatePreview();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 @Override
@@ -423,7 +477,6 @@ public class Camera {
     private void startCameraPreview() {
         try {
             SurfaceTexture texture = TEXTURE_VIEW.getSurfaceTexture();
-            assert texture != null;
 
             texture.setDefaultBufferSize(TEXTURE_VIEW.getWidth(), TEXTURE_VIEW.getHeight());
             Surface surface = new Surface(texture);
@@ -438,7 +491,11 @@ public class Camera {
                         return;
                     }
                     CAMERA_CAPTURE_SESSION = session;
-                    updatePreview();
+                    try {
+                        updatePreview();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 @Override
@@ -446,12 +503,12 @@ public class Camera {
                     Toast.makeText(ACTIVITY, "Failed: " + session, Toast.LENGTH_SHORT).show();
                 }
             }, null);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void updatePreview() {
+    private void updatePreview() throws Exception {
         if (CAMERA_DEVICE == null) {
             return;
         }
